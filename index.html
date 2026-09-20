@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LoanDesk CRM</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">LD</span><span class="brand-name">LoanDesk</span></div>
+    <nav id="nav">
+      <a href="#/" data-match="dashboard"><span class="ico">▦</span><span>Dashboard</span></a>
+      <a href="#/clients" data-match="clients"><span class="ico">▤</span><span>Clients</span></a>
+      <a href="#/loans" data-match="loans"><span class="ico">◈</span><span>Loans</span></a>
+      <a href="#/occasions" data-match="occasions"><span class="ico">✦</span><span>Occasions</span></a>
+      <a href="#/lookup" data-match="lookup"><span class="ico">✈</span><span>Instant Lookup</span></a>
+    </nav>
+    <div class="sidebar-foot">Prototype · mock data</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <form id="ask-form" class="ask">
+        <span class="ask-ico">⌕</span>
+        <input id="ask-input" type="text" placeholder="Ask about a client..." autocomplete="off">
+      </form>
+      <div class="who"><span class="avatar">EL</span><span class="who-name">Ellice Au</span></div>
+    </header>
+    <div id="ask-answer" class="ask-answer" hidden></div>
+    <main id="view"></main>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
