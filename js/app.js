@@ -6,6 +6,7 @@ import { loansPage } from './pages/loans.js';
 import { loanDetail } from './pages/loanDetail.js';
 import { occasions } from './pages/occasions.js';
 import { telegram } from './pages/telegram.js';
+import { clientBot } from './pages/clientBot.js';
 import { close as closeModal } from './modal.js';
 import { escapeHtml } from './format.js';
 
@@ -16,6 +17,8 @@ defineRoute('/loans', loansPage);
 defineRoute('/loans/:id', loanDetail);
 defineRoute('/occasions', occasions);
 defineRoute('/lookup', telegram);
+defineRoute('/client-bot', clientBot);
+defineRoute('/client-bot/:id', clientBot);
 
 const nav = document.getElementById('nav');
 

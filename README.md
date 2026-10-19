@@ -18,6 +18,7 @@ The point of this build is to validate navigation, layout and information hierar
 | `#/loans/:id` | Loan detail — full terms, repayment progress, link to parent client |
 | `#/occasions` | Director birthdays + incorporation anniversaries, next 90 days |
 | `#/lookup` | Instant Lookup — simulated Telegram bot for pulling client data by text |
+| `#/client-bot[/:id]` | Client Bot — simulated Telegram bot for *clients* to monitor their own loans |
 
 ## Dashboard visuals
 
@@ -60,6 +61,27 @@ Nothing is sent to Telegram and no model is involved: replies are read straight 
 same mock arrays as the rest of the app, so they always agree with what's on the other
 screens. A real build would run a bot webhook against the same data, with the broker's
 chat ID bound to their CRM account.
+
+## Client Bot (clients monitor their own loans)
+
+`#/client-bot` mocks a Telegram bot your **clients** text. It is bound to one company
+(the "Chatting as" selector stands in for the client's chat ID), so it only ever shows
+that client's facilities and never the broker's internal notes. Client detail pages have
+a **Preview client bot** button.
+
+| Command | Returns |
+|---|---|
+| `/myloans` | every facility — outstanding, rate, repayment progress, maturity |
+| `/balance` | total outstanding and per-loan repayment progress |
+| `/next` | next payment due on each active loan |
+| `/schedule [n]` | next n payments (default 6) across loans |
+| `/maturity` | maturity countdowns, flagged at 60 / 30 days |
+| `/refinance` | mock enquiry to the broker (nothing is sent) |
+| `/contact` | broker phone and email |
+
+On open the bot also posts a reminder for payments due within 7 days or maturities within
+60 days. Instalments are **estimates** (`js/schedule.js`: amortising formula from rate,
+tenure and frequency); a real build would read each lender's repayment schedule.
 
 ## Add / edit records
 
@@ -126,6 +148,8 @@ js/router.js        hash router (:param matching)
 js/data.js          mock companies, directors, loans + derived helpers
 js/format.js        currency / date / badge helpers
 js/modal.js         mock message composer + toast
+js/chat.js          shared chat plumbing for the two Telegram simulators
+js/schedule.js      estimated instalment schedule used by the client bot
 js/forms.js         add / edit forms for clients and loans
 js/charts.js        dashboard chart builders + hover tooltip
 js/pages/*.js       one module per screen (dashboard, clients, loans, occasions, telegram)

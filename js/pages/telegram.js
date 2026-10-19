@@ -5,6 +5,7 @@
 // the answers stay truthful to whatever is on screen elsewhere in the prototype.
 
 import { el } from '../router.js';
+import { mountChat } from '../chat.js';
 import {
   companies, loans, getCompany, loansForCompany,
   loansMaturingBetween, upcomingOccasions, daysUntil
@@ -218,66 +219,11 @@ export function telegram() {
       </div>
     </div>`);
 
-  const log = root.querySelector('#log');
-  const form = root.querySelector('#compose');
-  const input = root.querySelector('#msg');
-
-  function scroll() {
-    log.scrollTop = log.scrollHeight;
-  }
-
-  function addOut(text) {
-    const div = document.createElement('div');
-    div.className = 'bub out';
-    div.innerHTML = `${escapeHtml(text)}<span class="tick">✓✓</span>`;
-    log.appendChild(div);
-    scroll();
-  }
-
-  function addIn({ html, links }) {
-    const div = document.createElement('div');
-    div.className = 'bub in';
-    div.innerHTML = html + (links.length
-      ? `<span class="bub-links">${links.map(l => `<a href="${l.href}">${escapeHtml(l.label)} →</a>`).join('')}</span>`
-      : '');
-    log.appendChild(div);
-    scroll();
-  }
-
-  function addTyping() {
-    const div = document.createElement('div');
-    div.className = 'bub in typing';
-    div.innerHTML = '<i></i><i></i><i></i>';
-    log.appendChild(div);
-    scroll();
-    return div;
-  }
-
-  function send(text) {
-    if (!text.trim()) return;
-    addOut(text);
-    const typing = addTyping();
-    setTimeout(() => {
-      typing.remove();
-      addIn(reply(text));
-    }, 450);
-  }
-
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    send(input.value);
-    input.value = '';
-    input.focus();
-  });
-
-  root.querySelector('#chips').addEventListener('click', e => {
-    const btn = e.target.closest('[data-send]');
-    if (btn) send(btn.dataset.send);
-  });
+  const chat = mountChat(root, reply);
 
   // Opening exchange so the screen is never empty.
-  addIn({ html: 'Hi Ellice 👋 Send me a client name, or /help for the command list.', links: [] });
-  send('loan info of ABC Logistics');
+  chat.addIn({ html: 'Hi Ellice 👋 Send me a client name, or /help for the command list.', links: [] });
+  chat.send('loan info of ABC Logistics');
 
   return root;
 }

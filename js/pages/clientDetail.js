@@ -23,6 +23,7 @@ export function clientDetail({ id }) {
         <div class="spacer"></div>
         <div style="display:flex;gap:10px;align-items:center">
           ${badge(company.status)}
+          <button id="bot">Preview client bot</button>
           <button id="edit">Edit Client</button>
           <button class="primary" id="gen">Generate Message</button>
         </div>
@@ -92,6 +93,7 @@ export function clientDetail({ id }) {
     openMessageModal({ kind: 'client', company });
   });
 
+  root.querySelector('#bot').addEventListener('click', () => navigate(`#/client-bot/${company.id}`));
   root.querySelector('#edit').addEventListener('click', () => openClientForm(company));
   root.querySelector('#add-loan').addEventListener('click', () => openLoanForm(null, { companyId: company.id }));
 
