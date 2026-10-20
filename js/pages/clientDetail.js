@@ -38,6 +38,9 @@ export function clientDetail({ id }) {
           <div class="field"><div class="k">Active facilities</div><div class="v">${clientLoans.filter(l => l.status === 'Active' || l.status === 'Approved').length}</div></div>
           <div class="field"><div class="k">Total outstanding</div><div class="v">${money(clientLoans.reduce((s, l) => s + l.outstanding, 0))}</div></div>
         </div>
+        <div class="section-title">Client portal</div>
+        <div class="notes">Portal access enabled — ${escapeHtml(company.name)} can sign in at the login page with
+          <b>${escapeHtml(company.contactEmail)}</b> (or any director's email) to view their own loans. Notes above stay internal.</div>
         <div class="section-title">Notes</div>
         <div class="notes">${escapeHtml(company.notes)}</div>
       </section>

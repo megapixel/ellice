@@ -4,9 +4,15 @@
 const routes = [];
 let outlet = null;
 let onAfterRender = null;
+let guard = null;
 
 export function defineRoute(pattern, render) {
   routes.push({ parts: pattern.split('/').filter(Boolean), render });
+}
+
+/** guard(path) returns a path to redirect to, or null to allow the route. */
+export function setGuard(fn) {
+  guard = fn;
 }
 
 export function start(outletEl, afterRender) {
@@ -55,6 +61,11 @@ function match(path) {
 
 function renderCurrent() {
   const path = currentPath();
+  const redirect = guard && guard(path);
+  if (redirect && redirect !== path) {
+    location.hash = '#' + redirect; // hashchange re-enters renderCurrent
+    return;
+  }
   const found = match(path) || match('/');
   outlet.innerHTML = '';
   const node = found.route.render(found.params);

@@ -494,7 +494,6 @@ a.card.stat:hover { border-color: var(--accent); }
 /* ---------- responsive ---------- */
 @media (max-width: 1000px) {
   .grid.c3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .detail-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
 @media (max-width: 900px) {
   .shell { flex-direction: column; }
@@ -514,4 +513,50 @@ a.card.stat:hover { border-color: var(--accent); }
 }
 @media (max-width: 680px) {
   .grid.c3, .grid.c2, .detail-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- sign-in + client portal ---------- */
+.portal-bar { display: none; }
+
+/* login: just the card, no CRM chrome */
+body[data-mode="login"] .sidebar,
+body[data-mode="login"] .topbar,
+body[data-mode="login"] #ask-answer { display: none; }
+
+/* client portal: no CRM chrome, own slim header, centred content */
+body[data-mode="client"] .sidebar,
+body[data-mode="client"] .topbar,
+body[data-mode="client"] #ask-answer { display: none; }
+body[data-mode="client"] .portal-bar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky; top: 0; z-index: 5;
+}
+body[data-mode="client"] .portal-bar .who { margin-left: auto; }
+body[data-mode="client"] main#view { width: 100%; max-width: 1040px; margin: 0 auto; }
+
+.topbar .who button { margin-left: 6px; }
+
+.login-wrap { min-height: calc(100vh - 48px); display: grid; place-items: center; }
+.login-card { width: 100%; max-width: 440px; padding: 26px; }
+.login-card h1 { margin: 18px 0 2px; font-size: 22px; letter-spacing: -.02em; }
+.login-card .ff label { display: block; margin-bottom: 12px; font-size: 13px; color: var(--muted); }
+.login-card .ff input { display: block; width: 100%; margin-top: 4px; }
+.login-error {
+  background: var(--bad-soft); color: var(--bad);
+  border-radius: 8px; padding: 8px 12px; font-size: 13px; margin-bottom: 12px;
+}
+.demo-row { width: 100%; text-align: left; border: none; border-top: 1px solid var(--border); border-radius: 0; background: none; padding: 9px 4px; }
+.demo-row:first-child { border-top: none; }
+.demo-row:hover { background: var(--surface-2); }
+
+.portal-alert { margin-bottom: 16px; background: var(--warn-soft); font-size: 14px; }
+.portal-contact { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+.table-wrap .bar { margin-top: 4px; }
+
+@media (max-width: 680px) {
+  body[data-mode="client"] .portal-bar { padding: 10px 16px; }
+  body[data-mode="client"] main#view, body[data-mode="login"] main#view { padding: 16px; }
 }

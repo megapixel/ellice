@@ -6,7 +6,7 @@
 <title>LoanDesk CRM</title>
 <link rel="stylesheet" href="css/app.css">
 </head>
-<body>
+<body data-mode="login">
 <div class="shell">
   <aside class="sidebar">
     <div class="brand"><span class="brand-mark">LD</span><span class="brand-name">LoanDesk</span></div>
@@ -27,7 +27,11 @@
         <span class="ask-ico">⌕</span>
         <input id="ask-input" type="text" placeholder="Ask about a client..." autocomplete="off">
       </form>
-      <div class="who"><span class="avatar">EL</span><span class="who-name">Ellice Au</span></div>
+      <div class="who"><span class="avatar">EL</span><span class="who-name">Ellice Au</span><button class="small" id="signout" type="button">Sign out</button></div>
+    </header>
+    <header class="portal-bar">
+      <div class="brand"><span class="brand-mark">LD</span><span class="brand-name">LoanDesk</span></div>
+      <div class="who"><span id="portal-who"></span><button class="small" id="portal-signout" type="button">Sign out</button></div>
     </header>
     <div id="ask-answer" class="ask-answer" hidden></div>
     <main id="view"></main>

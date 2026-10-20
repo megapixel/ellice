@@ -11,6 +11,9 @@ The point of this build is to validate navigation, layout and information hierar
 
 | Route | Screen |
 |---|---|
+| `#/login` | Sign in — Client or Broker, with one-click demo accounts |
+| `#/portal` | **Client portal** — a signed-in client's own loans, next payment, maturities, upcoming payments, broker contact |
+| `#/portal/loans/:id` | Client portal loan detail (no internal notes) |
 | `#/` | Dashboard — stat tiles, three charts, maturities at 30/60/90 days, occasions, recent approvals, Insights |
 | `#/clients` | Client list (search + status filter) |
 | `#/clients/:id` | Client detail — company info, directors, loans table |
@@ -19,6 +22,20 @@ The point of this build is to validate navigation, layout and information hierar
 | `#/occasions` | Director birthdays + incorporation anniversaries, next 90 days |
 | `#/lookup` | Instant Lookup — simulated Telegram bot for pulling client data by text |
 | `#/client-bot[/:id]` | Client Bot — simulated Telegram bot for *clients* to monitor their own loans |
+
+## Sign-in and client portal
+
+The app opens at a login screen. **Broker** (`ellice@loandesk.example`) gets the full CRM.
+**Client** logins open a separate portal: slim header, no sidebar, scoped to one company.
+Any client contact or director email in the mock data is a valid login, so clients added
+through the UI get access automatically. Every account uses the password `demo`; the login
+page lists the accounts with a one-click "Use" button.
+
+Rules enforced by the route guard (`js/auth.js`): signed-out users are sent to login; clients
+can only reach `#/portal…` (any CRM URL redirects back); brokers can't open the portal. A client
+opening another company's loan id sees "Facility not found", and broker notes are never shown.
+Sessions live in `sessionStorage`. This is **UI-only mock auth** — a real build needs server-side
+sessions and per-request authorisation checks, since client-side guards are not security.
 
 ## Dashboard visuals
 
@@ -143,7 +160,8 @@ project subpath such as `username.github.io/repo/`.
 ```
 index.html          shell: sidebar, header search, view outlet, modal root
 css/app.css         design tokens, layout, tables, modal; light + dark
-js/app.js           boot: routes, nav sync, header search
+js/app.js           boot: routes, auth mode, nav sync, header search
+js/auth.js          mock sign-in, session, route guard
 js/router.js        hash router (:param matching)
 js/data.js          mock companies, directors, loans + derived helpers
 js/format.js        currency / date / badge helpers

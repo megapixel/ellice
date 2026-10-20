@@ -1,4 +1,4 @@
-import { defineRoute, start, currentPath } from './router.js';
+import { defineRoute, start, currentPath, setGuard, navigate } from './router.js';
 import { dashboard } from './pages/dashboard.js';
 import { clients } from './pages/clients.js';
 import { clientDetail } from './pages/clientDetail.js';
@@ -7,9 +7,15 @@ import { loanDetail } from './pages/loanDetail.js';
 import { occasions } from './pages/occasions.js';
 import { telegram } from './pages/telegram.js';
 import { clientBot } from './pages/clientBot.js';
+import { login } from './pages/login.js';
+import { portal, portalLoan } from './pages/portal.js';
+import { currentUser, guard, signOut } from './auth.js';
 import { close as closeModal } from './modal.js';
 import { escapeHtml } from './format.js';
 
+defineRoute('/login', login);
+defineRoute('/portal', portal);
+defineRoute('/portal/loans/:id', portalLoan);
 defineRoute('/', dashboard);
 defineRoute('/clients', clients);
 defineRoute('/clients/:id', clientDetail);
@@ -56,7 +62,40 @@ askForm.addEventListener('submit', e => {
   });
 });
 
+/* ---- sign-in state: login screen, broker CRM, or client portal ---- */
+const whoName = document.querySelector('.who-name');
+const whoAvatar = document.querySelector('.who .avatar');
+const portalWho = document.getElementById('portal-who');
+
+function initials(name) {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+
+function applyMode() {
+  const user = currentUser();
+  document.body.dataset.mode = user ? user.role : 'login';
+  if (!user) return;
+  if (user.role === 'broker') {
+    whoName.textContent = user.name;
+    whoAvatar.textContent = initials(user.name);
+  } else {
+    portalWho.textContent = user.name;
+  }
+}
+
+function logout() {
+  signOut();
+  askAnswer.hidden = true;
+  navigate('#/login');
+}
+
+document.getElementById('signout').addEventListener('click', logout);
+document.getElementById('portal-signout').addEventListener('click', logout);
+
+setGuard(guard);
+
 start(document.getElementById('view'), path => {
+  applyMode();
   syncNav(path);
   closeModal();
 });
