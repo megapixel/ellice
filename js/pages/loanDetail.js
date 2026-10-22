@@ -51,9 +51,9 @@ export function loanDetail({ id }) {
         <div class="section-title">Invoice</div>
         ${invoice ? `<a class="row-link" href="#/invoices/${invoice.id}" style="display:flex">
             <span class="row-main"><span class="row-title">${escapeHtml(invoice.number)} · ${money(invoice.total)}</span>
-              <span class="row-meta">Arrangement fee, issued ${date(invoice.issueDate)} · due ${date(invoice.dueDate)}</span></span>
+              <span class="row-meta">Arrangement fee, ${invoice.status === 'Draft' ? 'draft awaiting your review' : 'issued ' + date(invoice.issueDate)} · due ${date(invoice.dueDate)}</span></span>
             <span class="row-right">${badge(invoiceStatus(invoice))}</span></a>`
-          : '<div class="muted" style="font-size:13px">No invoice yet — one is issued automatically when a disbursement date is recorded.</div>'}
+          : '<div class="muted" style="font-size:13px">No invoice yet — a draft is generated automatically when a disbursement date is recorded.</div>'}
 
         <div class="section-title">Notes</div>
         <div class="notes">${escapeHtml(loan.notes)}</div>

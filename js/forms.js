@@ -236,8 +236,8 @@ export function openLoanForm(existing = null, defaults = {}) {
       ${select('Status', 'status', l.status, LOAN_STATUSES)}
       ${textarea('Notes', 'notes', l.notes)}
     </div>
-    <p class="muted" style="font-size:12.5px;margin:10px 0 0">Recording a disbursement date issues the client an arrangement-fee invoice
-      (${ARRANGEMENT_FEE_RATE * 100}% + GST) automatically, once per facility.</p>`
+    <p class="muted" style="font-size:12.5px;margin:10px 0 0">Recording a disbursement date creates a draft arrangement-fee invoice
+      (flat ${ARRANGEMENT_FEE_RATE * 100}% + GST, placeholder) for you to review and send — once per facility.</p>`
   );
 
   form.querySelector('[name="interestRate"]').step = '0.01';
@@ -282,7 +282,7 @@ export function openLoanForm(existing = null, defaults = {}) {
     closeForm();
     const base = existing ? 'Loan updated (in memory only)' : 'Loan added (in memory only)';
     toast(invoice && !hadInvoice
-      ? `${base} · Invoice ${invoice.number} issued to ${getCompany(saved.companyId).name}`
+      ? `${base} · Draft invoice ${invoice.number} ready for your review`
       : base);
 
     if (existing) refresh();

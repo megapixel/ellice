@@ -1,11 +1,12 @@
 // Invoices — broker list + detail, and the printable invoice document shared with the
 // client portal. Invoices are raised automatically when a disbursement is recorded
 // (see autoInvoice in js/data.js) or created by hand for other services. Mock only:
-// "Sent" means visible in the client's portal; nothing is emailed.
+// Auto invoices start as Drafts (human-in-the-loop); "Send to client" makes them visible in
+// the client's portal. Nothing is actually emailed.
 
 import { el, navigate, refresh } from '../router.js';
 import {
-  invoices, getInvoice, getCompany, getLoan, invoiceStatus, setInvoiceStatus, GST_RATE
+  invoices, getInvoice, getCompany, getLoan, invoiceStatus, setInvoiceStatus, GST_RATE, FEE_DISCLAIMER
 } from '../data.js';
 import { money, date, badge, escapeHtml } from '../format.js';
 import { statTile } from '../charts.js';
@@ -20,19 +21,23 @@ export function invoicesPage() {
   const unpaid = invoices.filter(i => ['Sent', 'Overdue'].includes(invoiceStatus(i)));
   const overdue = invoices.filter(i => invoiceStatus(i) === 'Overdue');
   const paid = invoices.filter(i => i.status === 'Paid');
+  const drafts = invoices.filter(i => i.status === 'Draft');
 
   const root = el(`
     <div>
       <div class="page-head">
         <div>
           <h1>Invoices</h1>
-          <div class="sub">Arrangement-fee invoices are raised automatically when a disbursement is recorded</div>
+          <div class="sub">A draft arrangement-fee invoice is generated when a disbursement is recorded — you review and send it</div>
         </div>
         <div class="spacer"></div>
         <button class="primary" id="add">+ New Invoice</button>
       </div>
 
-      <div class="grid c3">
+      <div class="card portal-alert" style="margin-bottom:16px">ℹ️ ${escapeHtml(FEE_DISCLAIMER)}</div>
+
+      <div class="grid c4">
+        ${statTile({ label: 'Drafts to review', value: String(drafts.length), sub: drafts.length ? 'not yet sent to clients' : 'nothing waiting' })}
         ${statTile({ label: 'Awaiting payment', value: money(sum(unpaid)), sub: `${unpaid.length} invoices` })}
         ${statTile({ label: 'Overdue', value: money(sum(overdue)), sub: `${overdue.length} invoices` })}
         ${statTile({ label: 'Paid', value: money(sum(paid)), sub: `${paid.length} invoices` })}
@@ -135,7 +140,7 @@ export function invoiceDocument(inv) {
         <div><span>GST (${Math.round(GST_RATE * 100)}%)</span><span>${inv.gst ? money(inv.gst) : '—'}</span></div>
         <div class="inv-total"><span>Total due</span><span>${money(inv.total)}</span></div>
       </div>
-      <p class="muted" style="font-size:12.5px;margin:16px 0 0">Payment terms: 14 days. Mock invoice for prototype purposes.</p>
+      <p class="muted" style="font-size:12.5px;margin:16px 0 0">Payment terms: 14 days. ${escapeHtml(FEE_DISCLAIMER)}</p>
     </section>`;
 }
 
@@ -154,16 +159,21 @@ export function invoiceDetail({ id }) {
         </div>
         <div class="spacer"></div>
         <div style="display:flex;gap:10px;align-items:center">
-          ${inv.status === 'Draft' ? '<button id="send">Mark as sent</button>' : ''}
+          ${inv.status === 'Draft' ? '<button class="primary" id="send">Send to client</button>' : ''}
           ${st !== 'Paid' && inv.status !== 'Draft' ? '<button class="primary" id="paid">Mark as paid</button>' : ''}
           <button id="print">Print</button>
         </div>
       </div>
+      ${inv.status === 'Draft' ? `<div class="card portal-alert no-print">✋ <b>Draft — awaiting your review.</b> This invoice was ${inv.auto ? 'generated automatically' : 'created manually'}; the client can't see it until you click <b>Send to client</b>.</div>` : ''}
       ${invoiceDocument(inv)}
     </div>`);
 
   const on = (sel, fn) => { const b = root.querySelector(sel); if (b) b.addEventListener('click', fn); };
-  on('#send', () => { setInvoiceStatus(inv.id, 'Sent'); toast('Marked as sent — now visible in the client portal (nothing emailed)'); refresh(); });
+  on('#send', () => {
+    setInvoiceStatus(inv.id, 'Sent');
+    toast(`Sent to ${getCompany(inv.companyId).contactEmail} — visible in their portal (mock, no email goes out)`);
+    refresh();
+  });
   on('#paid', () => { setInvoiceStatus(inv.id, 'Paid'); toast('Marked as paid'); refresh(); });
   on('#print', () => window.print());
   return root;

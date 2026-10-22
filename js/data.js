@@ -470,10 +470,13 @@ export const LOAN_TYPES = allServices().filter(s => s.loan).map(s => s.name);
 /* ---------------- invoices ----------------
    Raised automatically when a disbursement is recorded on a facility
    (arrangement fee = ARRANGEMENT_FEE_RATE of the amount disbursed, plus GST),
-   or created by hand for any other service. Mock only: nothing is emailed. */
+   or created by hand for any other service. Auto invoices are created as Drafts:
+   a person reviews and clicks Send. Mock only: nothing is emailed.
+   The flat fee rate is a prototype placeholder (see FEE_DISCLAIMER). */
 
 export const ARRANGEMENT_FEE_RATE = 0.01;
 export const GST_RATE = 0.09;
+export const FEE_DISCLAIMER = `Prototype: the ${ARRANGEMENT_FEE_RATE * 100}% flat arrangement fee and ${GST_RATE * 100}% GST are placeholder assumptions, not real fee terms or a tax invoice.`;
 const PAYMENT_TERMS_DAYS = 14;
 
 export const invoices = [];
@@ -539,7 +542,7 @@ function autoInvoice(loan, issueDate = iso(TODAY)) {
     description: `Arrangement fee (${ARRANGEMENT_FEE_RATE * 100}% of ${money(loan.amountApproved)} disbursed on ${fmtDate(loan.disbursementDate)}) — ${loan.lender} ${loan.type}`,
     subtotal: Math.round(loan.amountApproved * ARRANGEMENT_FEE_RATE),
     issueDate,
-    status: 'Sent',
+    status: 'Draft',   // human-in-the-loop: generated here, sent by a person
     auto: true
   });
 }

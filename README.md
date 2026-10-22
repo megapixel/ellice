@@ -104,21 +104,24 @@ On open the bot also posts a reminder for payments due within 7 days or maturiti
 60 days. Instalments are **estimates** (`js/schedule.js`: amortising formula from rate,
 tenure and frequency); a real build would read each lender's repayment schedule.
 
-## Invoices (auto-raised on disbursement)
+## Invoices (auto-generated, human-approved)
 
 Recording a **disbursement date** on a facility (new or edited, status not Pending/Rejected)
-issues the client an **arrangement-fee invoice** automatically — 1% of the amount disbursed
-plus 9% GST, 14-day terms, status *Sent*, numbered `INV-<year>-0001…`. It fires once per
-facility (re-saving never duplicates), and a toast names the invoice. Existing disbursed
-facilities are backfilled with invoices; one is left unpaid so the demo shows an *Overdue*.
+generates an **arrangement-fee invoice as a Draft** — a flat 1% of the amount disbursed plus 9%
+GST, 14-day terms, numbered `INV-<year>-0001…`. A person reviews it and clicks **Send to client**;
+until then the client can't see it (human-in-the-loop). It fires once per facility (re-saving
+never duplicates), and a toast says a draft is ready. Existing disbursed facilities are
+backfilled as already sent/paid; one is left unpaid so the demo shows an *Overdue*.
 
-- Broker: `#/invoices` (tiles for awaiting / overdue / paid), invoice detail with **Mark as sent / paid**
-  and **Print**; the loan and client pages link to their invoices; `+ New Invoice` bills other
-  services (corporate secretarial, accounting, insurance…) as a Draft or Sent.
+- Broker: `#/invoices` (tiles for drafts to review / awaiting / overdue / paid), invoice detail with
+  **Send to client**, **Mark as paid** and **Print**; loan and client pages link to their invoices;
+  `+ New Invoice` bills other services (corporate secretarial, accounting, insurance…).
 - Client portal: an **Invoices** table and printable invoice page. Clients never see Drafts or
   other companies' invoices.
-- The 1% rate is `ARRANGEMENT_FEE_RATE` in `js/data.js` (a placeholder — set the real fee basis).
-  "Sent" only means visible in the portal; no email is sent.
+- **Disclaimer:** the flat 1% fee (`ARRANGEMENT_FEE_RATE`) and 9% GST in `js/data.js` are placeholder
+  assumptions, not real fee terms or a tax invoice. The prototype says so on the Invoices page,
+  on every invoice, and in the loan form. "Send" only makes the invoice visible in the portal;
+  no email goes out.
 
 ## Services catalogue
 
