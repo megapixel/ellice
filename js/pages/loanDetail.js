@@ -1,5 +1,5 @@
 import { el } from '../router.js';
-import { getLoan, getCompany, daysUntil } from '../data.js';
+import { getLoan, getCompany, daysUntil, invoiceForLoan, invoiceStatus } from '../data.js';
 import { date, money, badge, escapeHtml, pct, inDays } from '../format.js';
 import { openMessageModal } from '../modal.js';
 import { openLoanForm } from '../forms.js';
@@ -13,6 +13,7 @@ export function loanDetail({ id }) {
   const repaid = loan.amountApproved - loan.outstanding;
   const repaidPct = pct(repaid, loan.amountApproved);
   const days = daysUntil(loan.maturityDate);
+  const invoice = invoiceForLoan(loan.id);
 
   const root = el(`
     <div>
@@ -46,6 +47,13 @@ export function loanDetail({ id }) {
         <div class="section-title">Repayment progress</div>
         <div class="muted" style="font-size:13px">${money(repaid)} repaid of ${money(loan.amountApproved)} (${repaidPct}%)</div>
         <div class="bar"><i style="width:${repaidPct}%"></i></div>
+
+        <div class="section-title">Invoice</div>
+        ${invoice ? `<a class="row-link" href="#/invoices/${invoice.id}" style="display:flex">
+            <span class="row-main"><span class="row-title">${escapeHtml(invoice.number)} · ${money(invoice.total)}</span>
+              <span class="row-meta">Arrangement fee, issued ${date(invoice.issueDate)} · due ${date(invoice.dueDate)}</span></span>
+            <span class="row-right">${badge(invoiceStatus(invoice))}</span></a>`
+          : '<div class="muted" style="font-size:13px">No invoice yet — one is issued automatically when a disbursement date is recorded.</div>'}
 
         <div class="section-title">Notes</div>
         <div class="notes">${escapeHtml(loan.notes)}</div>

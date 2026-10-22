@@ -14,11 +14,13 @@ The point of this build is to validate navigation, layout and information hierar
 | `#/login` | Sign in — Client or Broker, with one-click demo accounts |
 | `#/portal` | **Client portal** — a signed-in client's own loans, next payment, maturities, upcoming payments, broker contact |
 | `#/portal/loans/:id` | Client portal loan detail (no internal notes) |
-| `#/` | Dashboard — stat tiles, three charts, maturities at 30/60/90 days, occasions, recent approvals, Insights |
+| `#/` | Dashboard — stat tiles, four charts, maturities at 30/60/90 days, occasions, recent approvals, Insights |
 | `#/clients` | Client list (search + status filter) |
 | `#/clients/:id` | Client detail — company info, directors, loans table |
 | `#/loans` | Loan list (search + status/type filters) |
 | `#/loans/:id` | Loan detail — full terms, repayment progress, link to parent client |
+| `#/invoices`, `#/invoices/:id` | Invoices — list with status filter, printable invoice, mark sent / paid, manual `+ New Invoice` |
+| `#/services` | Services catalogue — loan products (with facility counts) plus corporate secretarial, accounting and related services |
 | `#/occasions` | Director birthdays + incorporation anniversaries, next 90 days |
 | `#/lookup` | Instant Lookup — simulated Telegram bot for pulling client data by text |
 | `#/client-bot[/:id]` | Client Bot — simulated Telegram bot for *clients* to monitor their own loans |
@@ -40,11 +42,13 @@ sessions and per-request authorisation checks, since client-side guards are not 
 ## Dashboard visuals
 
 Above the lists the dashboard leads with four stat tiles (portfolio outstanding,
-maturing in 90 days, approved this month, occasions in 30 days) and three charts,
+maturing in 90 days, approved this month, occasions in 30 days) and four charts,
 all built in plain HTML/CSS in `js/charts.js` — no chart library:
 
 - **Maturity runway** — columns of outstanding balance falling due per 30-day window.
 - **Exposure by lender** — horizontal bars, largest first.
+- **Disbursed by loan type** — horizontal bars of amount disbursed per loan type (working
+  capital, term, trade finance, equipment, property); the total disbursed is in the subtitle.
 - **Book by status** — one stacked bar of approved amount by facility status, with a
   labelled legend carrying the values.
 
@@ -99,6 +103,31 @@ a **Preview client bot** button.
 On open the bot also posts a reminder for payments due within 7 days or maturities within
 60 days. Instalments are **estimates** (`js/schedule.js`: amortising formula from rate,
 tenure and frequency); a real build would read each lender's repayment schedule.
+
+## Invoices (auto-raised on disbursement)
+
+Recording a **disbursement date** on a facility (new or edited, status not Pending/Rejected)
+issues the client an **arrangement-fee invoice** automatically — 1% of the amount disbursed
+plus 9% GST, 14-day terms, status *Sent*, numbered `INV-<year>-0001…`. It fires once per
+facility (re-saving never duplicates), and a toast names the invoice. Existing disbursed
+facilities are backfilled with invoices; one is left unpaid so the demo shows an *Overdue*.
+
+- Broker: `#/invoices` (tiles for awaiting / overdue / paid), invoice detail with **Mark as sent / paid**
+  and **Print**; the loan and client pages link to their invoices; `+ New Invoice` bills other
+  services (corporate secretarial, accounting, insurance…) as a Draft or Sent.
+- Client portal: an **Invoices** table and printable invoice page. Clients never see Drafts or
+  other companies' invoices.
+- The 1% rate is `ARRANGEMENT_FEE_RATE` in `js/data.js` (a placeholder — set the real fee basis).
+  "Sent" only means visible in the portal; no email is sent.
+
+## Services catalogue
+
+`SERVICE_CATALOGUE` in `js/data.js` holds what the firm offers: commercial financing (unsecured:
+micro / SME WCL, term, revolving; secured: trade lines, factoring, commercial property, hire
+purchase), personal financing (residential property and refinancing, car / COE), corporate
+secretarial (incorporation, ACRA), accounting, insurance and property services. Loan products
+double as the **Loan type** choices on facilities and the dashboard breakdown, and clients can
+tap a service in their portal to send a (mock) enquiry.
 
 ## Add / edit records
 
@@ -161,6 +190,8 @@ project subpath such as `username.github.io/repo/`.
 index.html          shell: sidebar, header search, view outlet, modal root
 css/app.css         design tokens, layout, tables, modal; light + dark
 js/app.js           boot: routes, auth mode, nav sync, header search
+js/pages/invoices.js invoices list, detail and shared invoice document
+js/pages/services.js services catalogue page
 js/auth.js          mock sign-in, session, route guard
 js/router.js        hash router (:param matching)
 js/data.js          mock companies, directors, loans + derived helpers

@@ -47,6 +47,10 @@ export function statusClass(status) {
     case 'Matured': return 'neutral';
     case 'Prospect': return 'info';
     case 'Dormant': return 'neutral';
+    case 'Paid': return 'ok';
+    case 'Sent': return 'info';
+    case 'Overdue': return 'bad';
+    case 'Draft': return 'neutral';
     default: return 'neutral';
   }
 }

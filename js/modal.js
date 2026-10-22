@@ -53,7 +53,7 @@ function loanDrafts(loan, company) {
   const amount = money(loan.amountApproved);
   const outstanding = money(loan.outstanding);
   const mature = date(loan.maturityDate);
-  const kind = loan.type.toLowerCase();
+  const kind = loan.type;
   return {
     subject: {
       Friendly: `${company.name} — ${loan.lender} facility matures ${mature}`,

@@ -1,6 +1,6 @@
 import { el } from '../router.js';
 import {
-  loans, companies, loansMaturingBetween, recentlyApproved,
+  LOAN_TYPES, loans, companies, loansMaturingBetween, recentlyApproved,
   upcomingOccasions, getCompany, daysUntil
 } from '../data.js';
 import { money, moneyShort, date, inDays, escapeHtml, badge, maturityBadge } from '../format.js';
@@ -88,6 +88,28 @@ function lenderChart() {
     <section class="card">
       <div class="card-head"><h2>Exposure by lender</h2></div>
       <div class="card-sub">Outstanding balance on live facilities</div>
+      ${bars(rows, moneyShort)}
+    </section>`;
+}
+
+function typeChart() {
+  const disbursed = loans.filter(l => l.disbursementDate);
+  const total = disbursed.reduce((s, l) => s + l.amountApproved, 0);
+  const rows = LOAN_TYPES.map(type => {
+    const list = disbursed.filter(l => l.type === type);
+    const value = list.reduce((s, l) => s + l.amountApproved, 0);
+    const out = list.reduce((s, l) => s + l.outstanding, 0);
+    return {
+      label: type,
+      value,
+      tipText: `${type}: ${money(value)} disbursed across ${list.length} ${list.length === 1 ? 'facility' : 'facilities'} · ${money(out)} still outstanding`
+    };
+  }).filter(r => r.value > 0).sort((a, b) => b.value - a.value);
+
+  return `
+    <section class="card">
+      <div class="card-head"><h2>Disbursed by loan type</h2></div>
+      <div class="card-sub">${money(total)} disbursed across ${disbursed.length} facilities</div>
       ${bars(rows, moneyShort)}
     </section>`;
 }
@@ -259,7 +281,10 @@ export function dashboard() {
         ${lenderChart()}
       </div>
 
-      <div style="margin-top:16px">${statusChart()}</div>
+      <div class="grid c2" style="margin-top:16px">
+        ${typeChart()}
+        ${statusChart()}
+      </div>
 
       <div class="grid c3" style="margin-top:16px">
         ${maturityCard('30 days', 0, 30)}

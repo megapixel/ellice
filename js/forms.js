@@ -5,7 +5,8 @@
 
 import { escapeHtml } from './format.js';
 import {
-  companies, saveCompany, saveLoan,
+  companies, saveCompany, saveLoan, createInvoice, invoiceForLoan, allServices, getCompany,
+  ARRANGEMENT_FEE_RATE, GST_RATE,
   CLIENT_STATUSES, LOAN_STATUSES, LOAN_TYPES
 } from './data.js';
 import { toast } from './modal.js';
@@ -234,7 +235,9 @@ export function openLoanForm(existing = null, defaults = {}) {
       ${select('Repayment frequency', 'repaymentFrequency', l.repaymentFrequency, REPAYMENT_FREQUENCIES)}
       ${select('Status', 'status', l.status, LOAN_STATUSES)}
       ${textarea('Notes', 'notes', l.notes)}
-    </div>`
+    </div>
+    <p class="muted" style="font-size:12.5px;margin:10px 0 0">Recording a disbursement date issues the client an arrangement-fee invoice
+      (${ARRANGEMENT_FEE_RATE * 100}% + GST) automatically, once per facility.</p>`
   );
 
   form.querySelector('[name="interestRate"]').step = '0.01';
@@ -273,11 +276,53 @@ export function openLoanForm(existing = null, defaults = {}) {
       notes: v('notes')
     };
 
+    const hadInvoice = existing && invoiceForLoan(existing.id);
     const saved = saveLoan(draft);
+    const invoice = invoiceForLoan(saved.id);
     closeForm();
-    toast(existing ? 'Loan updated (in memory only)' : 'Loan added (in memory only)');
+    const base = existing ? 'Loan updated (in memory only)' : 'Loan added (in memory only)';
+    toast(invoice && !hadInvoice
+      ? `${base} · Invoice ${invoice.number} issued to ${getCompany(saved.companyId).name}`
+      : base);
 
     if (existing) refresh();
     else navigate(`#/loans/${saved.id}`);
+  });
+}
+
+/* ---------------- invoice form (manual — auto invoices come from disbursements) ---------------- */
+
+export function openInvoiceForm() {
+  const services = allServices();
+  const form = shell('New Invoice', 'For corporate secretarial, accounting, insurance and other services', `
+    <div class="form-grid">
+      ${select('Client', 'companyId', companies[0] && companies[0].id,
+        companies.map(c => ({ value: c.id, label: c.name })), { span: 2 })}
+      ${select('Service', 'service', services[0].name, services.map(x => x.name), { span: 2 })}
+      ${textarea('Description', 'description', '')}
+      ${field('Amount before GST (S$)', 'amount', '', { type: 'number', required: true })}
+      ${select('GST', 'gst', 'yes', [{ value: 'yes', label: `Add ${Math.round(GST_RATE * 100)}% GST` }, { value: 'no', label: 'No GST' }])}
+      ${select('Status', 'status', 'Draft', ['Draft', 'Sent'])}
+    </div>`);
+
+  form.querySelector('[name="amount"]').step = '0.01';
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const v = n => (form.elements[n].value || '').trim();
+    const amount = Number(v('amount'));
+    if (!(amount > 0)) return showError(form, 'Enter an amount greater than zero.');
+
+    const inv = createInvoice({
+      companyId: v('companyId'),
+      service: v('service'),
+      description: v('description') || v('service'),
+      subtotal: amount,
+      withGst: v('gst') === 'yes',
+      status: v('status')
+    });
+    closeForm();
+    toast(`Invoice ${inv.number} created (in memory only)`);
+    navigate(`#/invoices/${inv.id}`);
   });
 }

@@ -5,10 +5,14 @@
 
 import { el, navigate } from '../router.js';
 import { currentUser } from '../auth.js';
-import { getCompany, getLoan, loansForCompany, daysUntil } from '../data.js';
+import {
+  getCompany, getLoan, loansForCompany, daysUntil,
+  invoicesForCompany, getInvoice, invoiceStatus, SERVICE_CATALOGUE
+} from '../data.js';
 import { money, date, badge, maturityBadge, escapeHtml, pct, inDays } from '../format.js';
 import { statTile } from '../charts.js';
 import { toast } from '../modal.js';
+import { invoiceDocument } from './invoices.js';
 import { isRepaying, nextInstalment, upcomingInstalments, instalmentAmount } from '../schedule.js';
 
 const BROKER = { name: 'Ellice Au', phone: '+65 9123 4567', email: 'ellice@loandesk.example' };
@@ -21,6 +25,12 @@ function liveLoans(companyId) {
 function myCompany() {
   const u = currentUser();
   return u && u.role === 'client' ? getCompany(u.companyId) : null;
+}
+
+/** Clients never see drafts. */
+function visibleInvoices(companyId) {
+  return invoicesForCompany(companyId).filter(i => i.status !== 'Draft')
+    .sort((a, b) => b.issueDate.localeCompare(a.issueDate) || b.number.localeCompare(a.number));
 }
 
 function alertsFor(loans) {
@@ -50,6 +60,7 @@ export function portal() {
   const schedule = loans.filter(isRepaying).flatMap(l => upcomingInstalments(l, 6))
     .sort((a, b) => a.date.localeCompare(b.date)).slice(0, 6);
   const alerts = alertsFor(loans);
+  const invs = visibleInvoices(company.id);
   const first = currentUser().name.trim().split(/\s+/)[0];
 
   const root = el(`
@@ -119,6 +130,34 @@ export function portal() {
         </table>
       </div>
 
+      <div class="section-title">Invoices</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Invoice</th><th>For</th><th>Due</th><th class="num">Total</th><th>Status</th></tr></thead>
+          <tbody id="inv-rows">
+            ${invs.length ? invs.map(i => `
+              <tr class="clickable" data-id="${i.id}">
+                <td class="strong">${escapeHtml(i.number)}</td>
+                <td>${escapeHtml(i.service)}</td>
+                <td>${date(i.dueDate)}</td>
+                <td class="num">${money(i.total)}</td>
+                <td>${badge(invoiceStatus(i))}</td>
+              </tr>`).join('')
+              : '<tr><td colspan="5"><div class="empty">No invoices yet.</div></td></tr>'}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title">Our services</div>
+      <div class="card">
+        <div class="muted" style="font-size:13px;margin-bottom:10px">Tap a service to ask ${escapeHtml(BROKER.name)} about it.</div>
+        ${SERVICE_CATALOGUE.map(cat => `
+          <div class="svc-chips">
+            <span class="k">${escapeHtml(cat.title)}</span>
+            ${cat.groups.flatMap(g => g.items).map(i => `<button class="chip" data-svc="${escapeHtml(i.name)}">${escapeHtml(i.name)}</button>`).join('')}
+          </div>`).join('')}
+      </div>
+
       <div class="section-title">Need to talk?</div>
       <div class="card portal-contact">
         <div>
@@ -133,6 +172,13 @@ export function portal() {
     const tr = e.target.closest('tr[data-id]');
     if (tr) navigate(`#/portal/loans/${tr.dataset.id}`);
   });
+  root.querySelector('#inv-rows').addEventListener('click', e => {
+    const tr = e.target.closest('tr[data-id]');
+    if (tr) navigate(`#/portal/invoices/${tr.dataset.id}`);
+  });
+  root.querySelectorAll('[data-svc]').forEach(b => b.addEventListener('click', () => {
+    toast(`Enquiry noted — ${BROKER.name} will contact you about ${b.dataset.svc} (mock).`);
+  }));
   root.querySelector('#refi').addEventListener('click', () => {
     toast(`Request noted — ${BROKER.name} will contact you within 1 business day (mock).`);
   });
@@ -196,4 +242,27 @@ export function portalLoan({ id }) {
       </div>
       <p class="muted" style="font-size:12.5px;margin-top:10px">Amounts are estimates from rate, tenure and frequency — your lender's statement is final.</p>
     </div>`);
+}
+
+export function portalInvoice({ id }) {
+  const company = myCompany();
+  if (!company) return el('<div class="empty">Please sign in.</div>');
+
+  const inv = getInvoice(id);
+  // Ownership check: own company only, and never drafts.
+  if (!inv || inv.companyId !== company.id || inv.status === 'Draft') {
+    return el('<div><a class="back" href="#/portal">← My loans</a><div class="empty">Invoice not found.</div></div>');
+  }
+  const root = el(`
+    <div>
+      <a class="back no-print" href="#/portal">← My loans</a>
+      <div class="page-head no-print">
+        <div><h1>${escapeHtml(inv.number)}</h1></div>
+        <div class="spacer"></div>
+        <button id="print">Print</button>
+      </div>
+      ${invoiceDocument(inv)}
+    </div>`);
+  root.querySelector('#print').addEventListener('click', () => window.print());
+  return root;
 }

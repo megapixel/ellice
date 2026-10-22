@@ -1,3 +1,5 @@
+import { money, date as fmtDate } from './format.js';
+
 // Mock data for the LoanDesk prototype. No backend, no persistence.
 // Dates that drive the dashboard windows are expressed as offsets from "today"
 // so every screen stays believably populated whenever the prototype is opened.
@@ -153,98 +155,98 @@ export const companies = [
 
 export const loans = [
   {
-    id: 'l1', companyId: 'c1', lender: 'DBS Bank', type: 'Working Capital',
+    id: 'l1', companyId: 'c1', lender: 'DBS Bank', type: 'Micro Loan (SME WCL)',
     amountApproved: 250000, outstanding: 182400, disbursementDate: offsetDays(-540),
     tenureMonths: 24, interestRate: 6.25, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(18), status: 'Active',
     notes: 'Secured against trade receivables. Client has hinted at a top-up before drydock season.'
   },
   {
-    id: 'l2', companyId: 'c1', lender: 'Maybank', type: 'Equipment Financing',
+    id: 'l2', companyId: 'c1', lender: 'Maybank', type: 'Hire Purchase (Machinery)',
     amountApproved: 420000, outstanding: 315800, disbursementDate: offsetDays(-400),
     tenureMonths: 60, interestRate: 5.1, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(420), status: 'Active',
     notes: 'Financing for two marine cranes. Hire-purchase structure.'
   },
   {
-    id: 'l3', companyId: 'c2', lender: 'OCBC Bank', type: 'Working Capital',
+    id: 'l3', companyId: 'c2', lender: 'OCBC Bank', type: 'Micro Loan (SME WCL)',
     amountApproved: 300000, outstanding: 96000, disbursementDate: offsetDays(-620),
     tenureMonths: 24, interestRate: 6.8, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(26), status: 'Active',
     notes: 'No top-up requested in 14 months. Receivables have grown ~30% over the same period.'
   },
   {
-    id: 'l4', companyId: 'c2', lender: 'Funding Societies', type: 'Trade Finance',
+    id: 'l4', companyId: 'c2', lender: 'Funding Societies', type: 'Trade Line',
     amountApproved: 180000, outstanding: 143200, disbursementDate: offsetDays(-120),
     tenureMonths: 12, interestRate: 9.4, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(245), status: 'Active',
     notes: 'Invoice financing line used for a major overseas shipper.'
   },
   {
-    id: 'l5', companyId: 'c3', lender: 'UOB', type: 'Term Loan',
+    id: 'l5', companyId: 'c3', lender: 'UOB', type: 'Business Term Loan',
     amountApproved: 500000, outstanding: 500000, disbursementDate: offsetDays(-12),
     tenureMonths: 60, interestRate: 5.45, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(1815), status: 'Approved',
     notes: 'Approved for the two new outlet fit-outs. First repayment due next month.'
   },
   {
-    id: 'l6', companyId: 'c3', lender: 'Validus', type: 'Working Capital',
+    id: 'l6', companyId: 'c3', lender: 'Validus', type: 'Micro Loan (SME WCL)',
     amountApproved: 120000, outstanding: 41500, disbursementDate: offsetDays(-330),
     tenureMonths: 12, interestRate: 10.2, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(52), status: 'Active',
     notes: 'Short-term bridge taken during renovation of the Bugis outlet.'
   },
   {
-    id: 'l7', companyId: 'c4', lender: 'DBS Bank', type: 'Term Loan',
+    id: 'l7', companyId: 'c4', lender: 'DBS Bank', type: 'Business Term Loan',
     amountApproved: 750000, outstanding: 212000, disbursementDate: offsetDays(-1300),
     tenureMonths: 48, interestRate: 4.9, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(44), status: 'Active',
     notes: 'CNC machinery expansion loan. Clean repayment record throughout.'
   },
   {
-    id: 'l8', companyId: 'c4', lender: 'OCBC Bank', type: 'Trade Finance',
+    id: 'l8', companyId: 'c4', lender: 'OCBC Bank', type: 'Trade Line',
     amountApproved: 220000, outstanding: 158700, disbursementDate: offsetDays(-260),
     tenureMonths: 12, interestRate: 7.35, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(71), status: 'Active',
     notes: 'Supports imports of raw alloy from Japan. Renews annually.'
   },
   {
-    id: 'l9', companyId: 'c4', lender: 'Maybank', type: 'Equipment Financing',
+    id: 'l9', companyId: 'c4', lender: 'Maybank', type: 'Hire Purchase (Machinery)',
     amountApproved: 165000, outstanding: 88900, disbursementDate: offsetDays(-700),
     tenureMonths: 36, interestRate: 5.6, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(85), status: 'Active',
     notes: 'Third facility maturing this quarter — consolidation discussion pending.'
   },
   {
-    id: 'l10', companyId: 'c5', lender: 'UOB', type: 'Property Loan',
+    id: 'l10', companyId: 'c5', lender: 'UOB', type: 'Commercial Property Loan',
     amountApproved: 1800000, outstanding: 1412000, disbursementDate: offsetDays(-980),
     tenureMonths: 180, interestRate: 4.35, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(4500), status: 'Active',
     notes: 'Industrial unit at Tuas. Fixed rate for the first 3 years, then board rate.'
   },
   {
-    id: 'l11', companyId: 'c5', lender: 'Funding Societies', type: 'Working Capital',
+    id: 'l11', companyId: 'c5', lender: 'Funding Societies', type: 'Micro Loan (SME WCL)',
     amountApproved: 200000, outstanding: 200000, disbursementDate: offsetDays(-5),
     tenureMonths: 18, interestRate: 8.75, repaymentFrequency: 'Quarterly',
     maturityDate: offsetDays(540), status: 'Approved',
     notes: 'Approved last week to bridge progress claims on the Jurong project.'
   },
   {
-    id: 'l12', companyId: 'c6', lender: 'OCBC Bank', type: 'Working Capital',
+    id: 'l12', companyId: 'c6', lender: 'OCBC Bank', type: 'Micro Loan (SME WCL)',
     amountApproved: 150000, outstanding: 0, disbursementDate: null,
     tenureMonths: 24, interestRate: 7.9, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(760), status: 'Pending',
     notes: 'Application submitted. Awaiting credit decision — 2 years of financials requested.'
   },
   {
-    id: 'l13', companyId: 'c7', lender: 'DBS Bank', type: 'Working Capital',
+    id: 'l13', companyId: 'c7', lender: 'DBS Bank', type: 'Micro Loan (SME WCL)',
     amountApproved: 260000, outstanding: 0, disbursementDate: offsetDays(-1100),
     tenureMonths: 24, interestRate: 6.5, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(-270), status: 'Matured',
     notes: 'Fully repaid. Client has not taken a new facility since.'
   },
   {
-    id: 'l14', companyId: 'c6', lender: 'Validus', type: 'Term Loan',
+    id: 'l14', companyId: 'c6', lender: 'Validus', type: 'Business Term Loan',
     amountApproved: 100000, outstanding: 0, disbursementDate: null,
     tenureMonths: 36, interestRate: 11.5, repaymentFrequency: 'Monthly',
     maturityDate: offsetDays(1080), status: 'Rejected',
@@ -275,15 +277,18 @@ export function saveCompany(draft) {
 }
 
 export function saveLoan(draft) {
+  let saved;
   if (draft.id) {
     const i = loans.findIndex(l => l.id === draft.id);
     if (i === -1) return null;
     loans[i] = { ...loans[i], ...draft };
-    return loans[i];
+    saved = loans[i];
+  } else {
+    saved = { ...draft, id: nextId(loans, 'l') };
+    loans.push(saved);
   }
-  const created = { ...draft, id: nextId(loans, 'l') };
-  loans.push(created);
-  return created;
+  autoInvoice(saved);   // disbursement recorded → invoice the client
+  return saved;
 }
 
 /* ---------------- derived helpers ---------------- */
@@ -399,5 +404,152 @@ function ordinal(n) {
 }
 
 export const LOAN_STATUSES = ['Active', 'Approved', 'Pending', 'Matured', 'Rejected'];
-export const LOAN_TYPES = ['Working Capital', 'Term Loan', 'Trade Finance', 'Equipment Financing', 'Property Loan'];
+// LOAN_TYPES is derived from the services catalogue below (items flagged `loan`).
 export const CLIENT_STATUSES = ['Active', 'Prospect', 'Dormant'];
+
+
+/* ---------------- services catalogue ----------------
+   What the firm offers. Items flagged `loan` are loan products: they become the
+   "Loan type" choices on facilities and the dashboard breakdown. */
+
+export const SERVICE_CATALOGUE = [
+  {
+    id: 'commercial', title: 'Commercial Financing', groups: [
+      { title: 'Unsecured', items: [
+        { name: 'Micro Loan (SME WCL)', loan: true },
+        { name: 'Business Term Loan', loan: true },
+        { name: 'Revolving Term Loan', loan: true }
+      ] },
+      { title: 'Partially / fully secured', items: [
+        { name: 'Trade Line', loan: true },
+        { name: 'Factoring', loan: true },
+        { name: 'Commercial Property Loan', loan: true,
+          note: 'Industrial, commercial, offices, shop houses, JTC land lease loans, building construction loans',
+          details: ['New purchase financing', 'Existing loan repricing', 'Encumbered / unencumbered property cash-out',
+            'Short-term bridging; interest servicing', 'Additional working capital, short and long tenor'] },
+        { name: 'Hire Purchase (Machinery)', loan: true,
+          details: ['New / old purchase financing', 'Debenture loan (used machine cash-out)'] }
+      ] }
+    ]
+  },
+  {
+    id: 'personal', title: 'Personal Financing', groups: [
+      { title: 'Properties', items: [
+        { name: 'Residential Property Loan', loan: true, note: 'New purchase financing — landed and condos only' },
+        { name: 'Residential Refinancing', loan: true, note: 'Existing residential landed / condos',
+          details: ['Better rates', 'Gear-up / cash-out', 'Transfer of ownership'] }
+      ] },
+      { title: 'Car financing', items: [
+        { name: 'Car Financing', loan: true, note: 'New and used cars',
+          details: ['COE financing', 'Change of ownership cash-out'] }
+      ] }
+    ]
+  },
+  {
+    id: 'other', title: 'Other Services', groups: [
+      { title: 'Corporate secretarial', items: [
+        { name: 'Company Incorporation', note: 'Setting up new companies' },
+        { name: 'ACRA Services',
+          details: ['AGM filing', 'Change of directors / shareholders', 'ACRA appointment as corporate secretary'] }
+      ] },
+      { title: 'Accounting', items: [{ name: 'Accounting Services' }] },
+      { title: 'Additional related services', items: [
+        { name: 'Insurance', note: 'Company and personal' },
+        { name: 'Property Purchase / Sale', note: 'Commercial and residential' }
+      ] }
+    ]
+  }
+];
+
+export function allServices() {
+  return SERVICE_CATALOGUE.flatMap(c => c.groups.flatMap(g => g.items.map(i => ({ ...i, category: c.title }))));
+}
+
+export const LOAN_TYPES = allServices().filter(s => s.loan).map(s => s.name);
+
+/* ---------------- invoices ----------------
+   Raised automatically when a disbursement is recorded on a facility
+   (arrangement fee = ARRANGEMENT_FEE_RATE of the amount disbursed, plus GST),
+   or created by hand for any other service. Mock only: nothing is emailed. */
+
+export const ARRANGEMENT_FEE_RATE = 0.01;
+export const GST_RATE = 0.09;
+const PAYMENT_TERMS_DAYS = 14;
+
+export const invoices = [];
+
+function addDays(isoDate, n) {
+  const d = new Date(isoDate + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  return iso(d);
+}
+
+function invoiceNumber(issueDate) {
+  const year = issueDate.slice(0, 4);
+  const used = invoices.filter(i => i.number.startsWith(`INV-${year}-`)).length;
+  return `INV-${year}-${String(used + 1).padStart(4, '0')}`;
+}
+
+export function createInvoice({ companyId, loanId = null, service, description, subtotal, withGst = true,
+  issueDate = iso(TODAY), status = 'Draft', auto = false }) {
+  const gst = withGst ? Math.round(subtotal * GST_RATE * 100) / 100 : 0;
+  const inv = {
+    id: nextId(invoices, 'i'),
+    number: invoiceNumber(issueDate),
+    companyId, loanId, service, description,
+    subtotal, gst, total: Math.round((subtotal + gst) * 100) / 100,
+    issueDate, dueDate: addDays(issueDate, PAYMENT_TERMS_DAYS),
+    status, auto
+  };
+  invoices.push(inv);
+  return inv;
+}
+
+export function getInvoice(id) {
+  return invoices.find(i => i.id === id) || null;
+}
+
+export function invoicesForCompany(companyId) {
+  return invoices.filter(i => i.companyId === companyId);
+}
+
+export function invoiceForLoan(loanId) {
+  return invoices.find(i => i.loanId === loanId && i.auto) || null;
+}
+
+/** Stored status is Draft / Sent / Paid; Overdue is derived from the due date. */
+export function invoiceStatus(inv) {
+  return inv.status === 'Sent' && daysUntil(inv.dueDate) < 0 ? 'Overdue' : inv.status;
+}
+
+export function setInvoiceStatus(id, status) {
+  const inv = getInvoice(id);
+  if (inv) inv.status = status;
+  return inv;
+}
+
+/** Issue the arrangement-fee invoice the first time a facility shows a disbursement. */
+function autoInvoice(loan, issueDate = iso(TODAY)) {
+  if (!loan.disbursementDate || ['Pending', 'Rejected'].includes(loan.status)) return null;
+  if (invoiceForLoan(loan.id)) return null;
+  return createInvoice({
+    companyId: loan.companyId,
+    loanId: loan.id,
+    service: 'Loan arrangement fee',
+    description: `Arrangement fee (${ARRANGEMENT_FEE_RATE * 100}% of ${money(loan.amountApproved)} disbursed on ${fmtDate(loan.disbursementDate)}) — ${loan.lender} ${loan.type}`,
+    subtotal: Math.round(loan.amountApproved * ARRANGEMENT_FEE_RATE),
+    issueDate,
+    status: 'Sent',
+    auto: true
+  });
+}
+
+/* Seed: backfill an invoice for every facility already disbursed. Older ones are paid;
+   l4 is left unpaid so the demo shows an overdue invoice. */
+loans
+  .filter(l => l.disbursementDate && !['Pending', 'Rejected'].includes(l.status))
+  .sort((a, b) => a.disbursementDate.localeCompare(b.disbursementDate))
+  .forEach(l => {
+    const inv = autoInvoice(l, l.disbursementDate);
+    inv.status = (l.id === 'l4' || -daysUntil(l.disbursementDate) <= 30) ? 'Sent' : 'Paid';
+  });

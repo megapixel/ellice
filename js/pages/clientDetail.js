@@ -1,5 +1,5 @@
 import { el, navigate } from '../router.js';
-import { getCompany, loansForCompany, daysUntilAnniversary, nextOccurrence } from '../data.js';
+import { getCompany, loansForCompany, invoicesForCompany, invoiceStatus, daysUntilAnniversary, nextOccurrence } from '../data.js';
 import { date, money, badge, escapeHtml, inDays, dateNoYear } from '../format.js';
 import { openMessageModal } from '../modal.js';
 import { openClientForm, openLoanForm } from '../forms.js';
@@ -11,6 +11,7 @@ export function clientDetail({ id }) {
   }
 
   const clientLoans = loansForCompany(company.id);
+  const clientInvoices = invoicesForCompany(company.id).sort((a, b) => b.issueDate.localeCompare(a.issueDate));
 
   const root = el(`
     <div>
@@ -85,6 +86,21 @@ export function clientDetail({ id }) {
         </table>
       </div>
 
+      <div class="section-title">Invoices (${clientInvoices.length})</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Invoice</th><th>For</th><th>Due</th><th class="num">Total</th><th>Status</th></tr></thead>
+          <tbody id="inv-rows">
+            ${clientInvoices.length ? clientInvoices.map(i => `
+              <tr class="clickable" data-id="${i.id}">
+                <td class="strong">${escapeHtml(i.number)}</td><td>${escapeHtml(i.service)}</td>
+                <td>${date(i.dueDate)}</td><td class="num">${money(i.total)}</td><td>${badge(invoiceStatus(i))}</td>
+              </tr>`).join('')
+              : '<tr><td colspan="5"><div class="empty">No invoices for this client.</div></td></tr>'}
+          </tbody>
+        </table>
+      </div>
+
       <div class="section-title">Upcoming anniversary</div>
       <div class="card">
         🏢 ${date(nextOccurrence(company.incorporationDate))} —
@@ -99,6 +115,11 @@ export function clientDetail({ id }) {
   root.querySelector('#bot').addEventListener('click', () => navigate(`#/client-bot/${company.id}`));
   root.querySelector('#edit').addEventListener('click', () => openClientForm(company));
   root.querySelector('#add-loan').addEventListener('click', () => openLoanForm(null, { companyId: company.id }));
+
+  root.querySelector('#inv-rows').addEventListener('click', e => {
+    const tr = e.target.closest('tr[data-id]');
+    if (tr) navigate(`#/invoices/${tr.dataset.id}`);
+  });
 
   root.querySelector('#rows').addEventListener('click', e => {
     const tr = e.target.closest('tr[data-id]');
